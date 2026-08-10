@@ -17,6 +17,13 @@
         <meta http-equiv="x-dns-prefetch-control" content="on">
         <link rel="dns-prefetch" href="https://ws.tildacdn.com">
         <link rel="dns-prefetch" href="https://static.tildacdn.net">
+        <link rel="preconnect" href="https://static.tildacdn.net" crossorigin>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <!-- Preload the cover names images so "عبدالله وروان" appears immediately without delay -->
+        <link rel="preload" as="image" href="https://static.tildacdn.net/tild3134-6461-4832-a236-633431616631/623915249_2629494717.png">
+        <link rel="preload" as="image" href="https://static.tildacdn.net/tild3336-3462-4961-a332-613731663665/623915249_2629494717.png">
+        <link rel="preload" as="audio" href="assets/aduo.mp3">
         <!--favicons-->
         <link rel="icon" type="image/png" sizes="32x32" href="https://static.tildacdn.net/tild3331-3833-4662-b234-353330306132/favicon-light_1.png" media="(prefers-color-scheme: light)"/>
         <link rel="icon" type="image/png" sizes="32x32" href="https://static.tildacdn.net/tild3239-3439-4130-a237-303663656638/favicon-dark_1.png" media="(prefers-color-scheme: dark)"/>
@@ -213,7 +220,7 @@
                             </audio>
                             <!-- Envelope overlay and intro video removed: invitation opens directly with music -->
                             <!-- Floating play/pause button -->
-                            <div id="weiAudioBtn" style="visibility:visible; opacity:1;">
+                            <!-- <div id="weiAudioBtn" style="visibility:visible; opacity:1;">
                                 <svg id="weiIconPause" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display:block">
                                     <rect x="6" y="5" width="4" height="14" rx="1"/>
                                     <rect x="14" y="5" width="4" height="14" rx="1"/>
@@ -221,42 +228,89 @@
                                 <svg id="weiIconPlay" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display:none">
                                     <polygon points="5,3 19,12 5,21"/>
                                 </svg>
-                            </div>
+                            </div> -->
                             <script>
                                 (function() {
                                     var audio = document.getElementById('weiAudio');
                                     var audioBtn = document.getElementById('weiAudioBtn');
                                     var iconPause = document.getElementById('weiIconPause');
                                     var iconPlay = document.getElementById('weiIconPlay');
+                                    var userUnmuted = false;
 
-                                    // Start music automatically as soon as the page loads
-                                    audio.volume = 1;
-                                    var ap = audio.play();
-                                    if (ap && ap.catch)
-                                        ap.catch(function() {});
+                                    audio.addEventListener('error', function() {
+                                        console.warn('weiAudio: the file could not be loaded — check that assets/aduo.mp3 really exists at that path on the server.');
+                                    });
 
-                                    // Fallback: some browsers block audio until the first user
-                                    // interaction, so also try again on the first tap anywhere.
-                                    document.addEventListener('click', function() {
-                                        if (audio.paused) {
-                                            var ap2 = audio.play();
-                                            if (ap2 && ap2.catch)
-                                                ap2.catch(function() {});
+                                    function setIcons(isPlaying) {
+                                        iconPause.style.display = isPlaying ? 'block' : 'none';
+                                        iconPlay.style.display = isPlaying ? 'none' : 'block';
+                                    }
+
+                                    function tryUnmutedPlay() {
+                                        audio.muted = false;
+                                        userUnmuted = true;
+                                        var ap = audio.play();
+                                        if (ap && ap.then) {
+                                            ap.then(function() {
+                                                setIcons(true);
+                                            }).catch(function() {
+                                                setIcons(!audio.paused);
+                                            });
+                                        } else {
+                                            setIcons(!audio.paused);
                                         }
-                                    }, {
-                                        once: true
+                                    }
+
+                                    function startMutedAutoplay() {
+                                        audio.volume = 1;
+                                        audio.muted = true;
+                                        var ap = audio.play();
+                                        if (ap && ap.catch)
+                                            ap.catch(function() {});
+                                        setIcons(!audio.paused);
+                                    }
+
+                                    // Start music automatically as soon as the page loads.
+                                    // Browsers block autoplay WITH sound until the user has
+                                    // interacted with the page, but muted autoplay is always
+                                    // allowed - so we start muted immediately, then unmute on
+                                    // the very first interaction (tap/click/scroll/key) so the
+                                    // song feels like it "plays by itself" without ever needing
+                                    // the button. We retry on a few different lifecycle events
+                                    // in case the browser wasn't ready on the very first try.
+                                    audio.load();
+                                    startMutedAutoplay();
+                                    document.addEventListener('DOMContentLoaded', startMutedAutoplay);
+                                    window.addEventListener('load', startMutedAutoplay);
+                                    window.addEventListener('pageshow', startMutedAutoplay);
+
+                                    ['click', 'touchstart', 'touchend', 'pointerdown', 'scroll', 'keydown'].forEach(function(evt) {
+                                        document.addEventListener(evt, function onFirstInteract() {
+                                            if (!userUnmuted) {
+                                                tryUnmutedPlay();
+                                            } else if (audio.paused) {
+                                                var ap2 = audio.play();
+                                                if (ap2 && ap2.catch)
+                                                    ap2.catch(function() {});
+                                            }
+                                        }, {
+                                            once: true,
+                                            passive: true
+                                        });
                                     });
 
                                     // Audio button toggle
                                     audioBtn.addEventListener('click', function() {
+                                        if (!userUnmuted) {
+                                            tryUnmutedPlay();
+                                            return;
+                                        }
                                         if (audio.paused) {
                                             audio.play();
-                                            iconPlay.style.display = 'none';
-                                            iconPause.style.display = 'block';
+                                            setIcons(true);
                                         } else {
                                             audio.pause();
-                                            iconPlay.style.display = 'block';
-                                            iconPause.style.display = 'none';
+                                            setIcons(false);
                                         }
                                     });
                                 }
@@ -1371,19 +1425,19 @@
                                 <img class='tn-atom__img t-img' data-original='https://static.tildacdn.net/tild3134-6461-4832-a236-633431616631/623915249_2629494717.png' src='https://thb.tildacdn.net/tild3134-6461-4832-a236-633431616631/-/resize/20x/623915249_2629494717.png' alt='' imgfield='tn_img_1779527203760000001'/>
                             </div>
                         </div>
-                        <div class='t396__elem tn-elem js-delay-anim tn-elem__24874460431763402147625 t-animate' data-elem-id='1763402147625' data-elem-type='text' data-field-top-value="294" data-field-left-value="320" data-field-height-value="168" data-field-width-value="560" data-field-axisy-value="top" data-field-axisx-value="left" data-field-container-value="grid" data-field-topunits-value="px" data-field-leftunits-value="px" data-field-heightunits-value="px" data-field-widthunits-value="px" data-animate-style="fadeinup" data-animate-duration="2" data-animate-delay="3" data-animate-distance="30" data-animate-mobile="y" data-field-textfit-value="autoheight" data-field-fontsize-value="80" data-field-left-res-320-value="-120" data-field-left-res-480-value="-40" data-field-left-res-640-value="40" data-field-left-res-960-value="200">
+                        <div class='t396__elem tn-elem js-delay-anim tn-elem__24874460431763402147625 t-animate' data-elem-id='1763402147625' data-elem-type='text' data-field-top-value="294" data-field-left-value="320" data-field-height-value="168" data-field-width-value="560" data-field-axisy-value="top" data-field-axisx-value="left" data-field-container-value="grid" data-field-topunits-value="px" data-field-leftunits-value="px" data-field-heightunits-value="px" data-field-widthunits-value="px" data-animate-style="fadeinup" data-animate-duration="2" data-animate-delay="0.2" data-animate-distance="30" data-animate-mobile="y" data-field-textfit-value="autoheight" data-field-fontsize-value="80" data-field-left-res-320-value="-120" data-field-left-res-480-value="-40" data-field-left-res-640-value="40" data-field-left-res-960-value="200">
                             <div class='tn-atom' field='tn_text_1763402147625'>
-                                عبدالله <br/>
-                                <br/>روان
+                                عبدالله<br/>
+                                <span style="display:block;font-size:0.45em;line-height:1;margin:0.25em 0;">&amp; </span>روان
                             </div>
                         </div>
-                        <div class='t396__elem tn-elem js-delay-anim tn-elem__2487446043176340398328864790 t-animate' data-elem-id='176340398328864790' data-elem-type='text' data-field-top-value="154" data-field-left-value="320" data-field-height-value="37" data-field-width-value="560" data-field-axisy-value="top" data-field-axisx-value="left" data-field-container-value="grid" data-field-topunits-value="px" data-field-leftunits-value="px" data-field-heightunits-value="px" data-field-widthunits-value="px" data-animate-style="fadeinup" data-animate-duration="2" data-animate-delay="3" data-animate-distance="30" data-animate-mobile="y" data-field-textfit-value="fixedsize" data-field-fontsize-value="40" data-field-left-res-320-value="-120" data-field-left-res-480-value="-40" data-field-left-res-640-value="40" data-field-left-res-960-value="200">
-                            <div class='tn-atom' field='tn_text_176340398328864790'>يوم الزفاف</div>
+                        <div class='t396__elem tn-elem js-delay-anim tn-elem__2487446043176340398328864790 t-animate' data-elem-id='176340398328864790' data-elem-type='text' data-field-top-value="154" data-field-left-value="320" data-field-height-value="37" data-field-width-value="560" data-field-axisy-value="top" data-field-axisx-value="left" data-field-container-value="grid" data-field-topunits-value="px" data-field-leftunits-value="px" data-field-heightunits-value="px" data-field-widthunits-value="px" data-animate-style="fadeinup" data-animate-duration="2" data-animate-delay="0.3" data-animate-distance="30" data-animate-mobile="y" data-field-textfit-value="fixedsize" data-field-fontsize-value="40" data-field-left-res-320-value="-120" data-field-left-res-480-value="-40" data-field-left-res-640-value="40" data-field-left-res-960-value="200">
+                            <div class='tn-atom' field='tn_text_176340398328864790'>كتب الكتاب</div>
                         </div>
-                        <div class='t396__elem tn-elem js-delay-anim tn-elem__2487446043176340401720454780 t-animate' data-elem-id='176340401720454780' data-elem-type='text' data-field-top-value="196" data-field-left-value="320" data-field-height-value="37" data-field-width-value="560" data-field-axisy-value="top" data-field-axisx-value="left" data-field-container-value="grid" data-field-topunits-value="px" data-field-leftunits-value="px" data-field-heightunits-value="px" data-field-widthunits-value="px" data-animate-style="fadeinup" data-animate-duration="2" data-animate-delay="3" data-animate-distance="30" data-animate-mobile="y" data-field-textfit-value="fixedsize" data-field-fontsize-value="25" data-field-left-res-320-value="-120" data-field-left-res-480-value="-40" data-field-left-res-640-value="40" data-field-left-res-960-value="200">
+                        <div class='t396__elem tn-elem js-delay-anim tn-elem__2487446043176340401720454780 t-animate' data-elem-id='176340401720454780' data-elem-type='text' data-field-top-value="196" data-field-left-value="320" data-field-height-value="37" data-field-width-value="560" data-field-axisy-value="top" data-field-axisx-value="left" data-field-container-value="grid" data-field-topunits-value="px" data-field-leftunits-value="px" data-field-heightunits-value="px" data-field-widthunits-value="px" data-animate-style="fadeinup" data-animate-duration="2" data-animate-delay="0.4" data-animate-distance="30" data-animate-mobile="y" data-field-textfit-value="fixedsize" data-field-fontsize-value="25" data-field-left-res-320-value="-120" data-field-left-res-480-value="-40" data-field-left-res-640-value="40" data-field-left-res-960-value="200" style="display:none;">
                             <div class='tn-atom' field='tn_text_176340401720454780'>30.09.2026</div>
                         </div>
-                        <div class='t396__elem tn-elem js-delay-anim tn-elem__2487446043176340390975774690 t-animate' data-elem-id='176340390975774690' data-elem-type='text' data-field-top-value="356" data-field-left-value="578" data-field-height-value="44" data-field-width-value="55" data-field-axisy-value="top" data-field-axisx-value="left" data-field-container-value="grid" data-field-topunits-value="px" data-field-leftunits-value="px" data-field-heightunits-value="px" data-field-widthunits-value="px" data-animate-style="fadeinup" data-animate-duration="2" data-animate-delay="3" data-animate-distance="30" data-animate-mobile="y" data-field-textfit-value="autoheight" data-field-fontsize-value="40" data-field-left-res-320-value="138" data-field-left-res-480-value="218" data-field-left-res-640-value="298" data-field-left-res-960-value="458">
+                        <div class='t396__elem tn-elem js-delay-anim tn-elem__2487446043176340390975774690 t-animate' data-elem-id='176340390975774690' data-elem-type='text' data-field-top-value="356" data-field-left-value="578" data-field-height-value="44" data-field-width-value="55" data-field-axisy-value="top" data-field-axisx-value="left" data-field-container-value="grid" data-field-topunits-value="px" data-field-leftunits-value="px" data-field-heightunits-value="px" data-field-widthunits-value="px" data-animate-style="fadeinup" data-animate-duration="2" data-animate-delay="0.2" data-animate-distance="30" data-animate-mobile="y" data-field-textfit-value="autoheight" data-field-fontsize-value="40" data-field-left-res-320-value="138" data-field-left-res-480-value="218" data-field-left-res-640-value="298" data-field-left-res-960-value="458" style="display:none;">
                             <div class='tn-atom' field='tn_text_176340390975774690'>&amp;</div>
                         </div>
                         <div class='t396__elem tn-elem tn-elem__24874460431780142978273000001 ' data-elem-id='1780142978273000001' data-elem-type='image' data-field-top-value="566" data-field-left-value="359" data-field-height-value="343" data-field-width-value="224" data-field-axisy-value="top" data-field-axisx-value="left" data-field-container-value="grid" data-field-topunits-value="px" data-field-leftunits-value="px" data-field-heightunits-value="px" data-field-widthunits-value="px" data-animate-mobile="y" data-animate-sbs-event="intoview" data-animate-sbs-trg="1" data-animate-sbs-trgofst="0" data-animate-sbs-loop="loop" data-animate-sbs-opts="[{'mx':0,'my':0,'sx':1,'sy':1,'op':1,'ro':0,'ti':0,'ea':'0','dt':0},{'mx':0,'my':0,'sx':1.06,'sy':1.06,'op':1,'ro':2,'ti':2000,'ea':'0','dt':0},{'mx':0,'my':0,'sx':1,'sy':1,'op':1,'ro':0,'ti':2000,'ea':'0','dt':0}]" data-field-filewidth-value="823" data-field-fileheight-value="1260" data-field-heightmode-value="hug" data-field-top-res-320-value="568" data-field-left-res-320-value="-77" data-field-height-res-320-value="334" data-field-width-res-320-value="218" data-field-left-res-480-value="2" data-field-height-res-480-value="343" data-field-left-res-640-value="77" data-field-height-res-640-value="343" data-field-left-res-960-value="238" data-field-height-res-960-value="343">
@@ -1411,7 +1465,7 @@
                                 وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُم مِّنْ أَنفُسِكُمْ أَزْوَاجًا لِّتَسْكُنُوا إِلَيْهَا وَجَعَلَ بَيْنَكُم مَّوَدَّةً وَرَحْمَةً
                             </div>
                         </div>
-                        <div class='t396__elem tn-elem tn-elem__24874460431782235970224000001 ' data-elem-id='1782235970224000001' data-elem-type='vector' data-field-top-value="558" data-field-left-value="588" data-field-height-value="16" data-field-width-value="25" data-field-axisy-value="top" data-field-axisx-value="left" data-field-container-value="grid" data-field-topunits-value="px" data-field-leftunits-value="px" data-field-heightunits-value="px" data-field-widthunits-value="px" data-animate-mobile="y" data-animate-sbs-event="intoview" data-animate-sbs-trg="1" data-animate-sbs-trgofst="0" data-animate-sbs-loop="loop" data-animate-sbs-opts="[{'mx':0,'my':0,'sx':1,'sy':1,'op':1,'ro':0,'ti':0,'ea':'0','dt':0},{'mx':0,'my':5,'sx':1,'sy':1,'op':1,'ro':0,'ti':600,'ea':'0','dt':0},{'mx':0,'my':0,'sx':1,'sy':1,'op':1,'ro':0,'ti':500,'ea':'0','dt':0}]" data-field-filewidth-value="25" data-field-fileheight-value="16" data-field-heightmode-value="hug" data-field-left-res-320-value="148" data-field-left-res-480-value="228" data-field-left-res-640-value="308" data-field-left-res-960-value="468">
+                        <div class='t396__elem tn-elem tn-elem__24874460431782235970224000001 ' data-elem-id='1782235970224000001' data-elem-type='vector' data-field-top-value="558" data-field-left-value="588" data-field-height-value="16" data-field-width-value="25" data-field-axisy-value="top" data-field-axisx-value="left" data-field-container-value="grid" data-field-topunits-value="px" data-field-leftunits-value="px" data-field-heightunits-value="px" data-field-widthunits-value="px" data-animate-mobile="y" data-animate-sbs-event="intoview" data-animate-sbs-trg="1" data-animate-sbs-trgofst="0" data-animate-sbs-loop="loop" data-animate-sbs-opts="[{'mx':0,'my':0,'sx':1,'sy':1,'op':1,'ro':0,'ti':0,'ea':'0','dt':0},{'mx':0,'my':5,'sx':1,'sy':1,'op':1,'ro':0,'ti':600,'ea':'0','dt':0},{'mx':0,'my':0,'sx':1,'sy':1,'op':1,'ro':0,'ti':500,'ea':'0','dt':0}]" data-field-filewidth-value="25" data-field-fileheight-value="16" data-field-heightmode-value="hug" data-field-left-res-320-value="148" data-field-left-res-480-value="228" data-field-left-res-640-value="308" data-field-left-res-960-value="468" style="display:none;">
                             <div class='tn-atom tn-atom__vector'>
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25.00 15.86" data-guides="{&quot;vertical&quot;:[],&quot;horizontal&quot;:[]}" role="img" aria-label="">
                                     <defs></defs>
@@ -1419,9 +1473,7 @@
                                 </svg>
                             </div>
                         </div>
-                        <div class='t396__elem tn-elem tn-elem__24874460431782235970225000002' data-elem-id='1782235970225000002' data-elem-type='text' data-field-top-value="518" data-field-left-value="442" data-field-height-value="35" data-field-width-value="316" data-field-axisy-value="top" data-field-axisx-value="left" data-field-container-value="grid" data-field-topunits-value="px" data-field-leftunits-value="px" data-field-heightunits-value="px" data-field-widthunits-value="px" data-field-textfit-value="autoheight" data-field-fontsize-value="32" data-field-left-res-320-value="2" data-field-left-res-480-value="82" data-field-left-res-640-value="162" data-field-left-res-960-value="322">
-                            <div class='tn-atom' field='tn_text_1782235970225000002'>مرر للأسفل</div>
-                        </div>
+                     
                     
                     </div>
                 </div>
@@ -1450,30 +1502,63 @@
                     }
                     #recFamilyHosts .wei-hosts-row {
                         display: flex;
+                        flex-direction: row;
                         justify-content: center;
                         align-items: center;
-                        gap: 40px;
-                        flex-wrap: wrap;
+                        gap: 32px;
+                        flex-wrap: nowrap;
                     }
                     #recFamilyHosts .wei-host {
                         font-size: 24px;
                         color: #333;
                         font-weight: 500;
                         line-height: 1.6;
+                        flex: 1 1 0;
+                        min-width: 0;
+                        text-align: center;
                     }
                     #recFamilyHosts .wei-hosts-sep {
                         width: 1px;
                         height: 44px;
+                        flex: 0 0 auto;
                         background: rgba(90,15,27,0.35);
                     }
+                    #recFamilyHosts .wei-aqd-title {
+                        margin-top: 32px;
+                        padding-top: 26px;
+                        border-top: 1px solid rgba(90,15,27,0.2);
+                        font-size: 19px;
+                        color: #5A0F1B;
+                        font-weight: 500;
+                        line-height: 1.8;
+                        letter-spacing: 0.01em;
+                    }
                     @media screen and (max-width: 480px) {
+                        #recFamilyHosts {
+                            padding: 40px 14px;
+                        }
                         #recFamilyHosts .wei-hosts-row {
-                            flex-direction: column;
-                            gap: 18px;
+                            gap: 14px;
+                        }
+                        #recFamilyHosts .wei-host {
+                            font-size: 17px;
+                            line-height: 1.5;
                         }
                         #recFamilyHosts .wei-hosts-sep {
-                            width: 60px;
-                            height: 1px;
+                            height: 34px;
+                        }
+                        #recFamilyHosts .wei-aqd-title {
+                            margin-top: 24px;
+                            padding-top: 20px;
+                            font-size: 16px;
+                        }
+                    }
+                    @media screen and (max-width: 360px) {
+                        #recFamilyHosts .wei-host {
+                            font-size: 15px;
+                        }
+                        #recFamilyHosts .wei-hosts-row {
+                            gap: 8px;
                         }
                     }
                 </style>
@@ -1484,6 +1569,7 @@
                         <div class="wei-hosts-sep"></div>
                         <div class="wei-host">حرم الحاج أيمن عنتر</div>
                     </div>
+                    <div class="wei-aqd-title">ندعوكم إلى حفل عقد قرآن</div>
                 </div>
             </div>
             <div id="rec2487446093" class="r t-rec t-rec_pt_15 t-rec_pb_15" style="padding-top:15px;padding-bottom:15px;background-color:#f9f0e0; " data-animationappear="off" data-record-type="396" data-bg-color="#f9f0e0">
@@ -1896,7 +1982,7 @@
                                         </div>
                                         <script>
                                             (function() {
-                                                var eventDate = new Date(2026,7,30,20,0,0);
+                                                var eventDate = new Date(2026,8,30,20,0,0);
                                                 var elDays = document.getElementById('days');
                                                 var elHours = document.getElementById('hours');
                                                 var elMins = document.getElementById('minutes');
@@ -2029,6 +2115,12 @@
                         color: #333;
                         font-weight: 500;
                     }
+                    #recEventTime .wei-event-date {
+                        font-family: 'Amiri', 'Cairo', serif !important;
+                        font-size: 22px;
+                        font-weight: 600;
+                        color: #5A0F1B;
+                    }
                     #recEventTime .wei-event-time {
                         font-family: 'Amiri', 'Cairo', serif !important;
                         font-size: 30px;
@@ -2039,7 +2131,8 @@
                 <div class="wei-event-wrap">
                     <div class="wei-event-title">موعد الحفل</div>
                     <div class="wei-event-card">
-                        <div class="wei-event-name">حفل الزفاف</div>
+                        <div class="wei-event-name">حفل كتب الكتاب</div>
+                        <div class="wei-event-date">الأربعاء ٣٠ سبتمبر ٢٠٢٦</div>
                         <div class="wei-event-time">٨:٠٠ م</div>
                     </div>
                 </div>
