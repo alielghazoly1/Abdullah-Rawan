@@ -180,147 +180,6 @@
     <body class="t-body" style="margin:0;">
         <!--allrecords-->
         <div id="allrecords" class="t-records" data-hook="blocks-collection-content-node" data-tilda-project-id="11836131" data-tilda-page-id="155232023" data-tilda-page-alias="thesacredgarden" data-tilda-formskey="b9e82ac5385c1bce198c7c2711836131" data-tilda-cookie="no" data-tilda-lazy="yes" data-tilda-root-zone="one" data-tilda-project-country="NL">
-            <div id="rec2487446003" class="r t-rec" style=" " data-animationappear="off" data-record-type="131">
-                <!-- T123 -->
-                <div class="t123">
-                    <div class="t-container_100 ">
-                        <div class="t-width t-width_100 ">
-                            <!-- nominify begin -->
-                            <style>
-                                @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&display=swap');
-                                /* ── Floating audio button ── */
-                                #weiAudioBtn {
-                                    position: fixed;
-                                    bottom: 20px;
-                                    right: 20px;
-                                    width: 60px;
-                                    height: 60px;
-                                    background: #5A0F1B;
-                                    border-radius: 50%;
-                                    display: flex;
-                                    justify-content: center;
-                                    align-items: center;
-                                    z-index: 2147483647;
-                                    cursor: pointer;
-                                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                                    visibility: hidden;
-                                    opacity: 0;
-                                    transition: opacity 0.3s ease-in-out;
-                                }
-
-                                #weiAudioBtn svg {
-                                    width: 30px;
-                                    height: 30px;
-                                    fill: white;
-                                }
-                            </style>
-                            <!-- Audio -->
-                            <audio id="weiAudio" loop>
-                                <source src="assets/aduo.mp3" type="audio/mp3">
-                            </audio>
-                            <!-- Envelope overlay and intro video removed: invitation opens directly with music -->
-                            <!-- Floating play/pause button -->
-                            <!-- <div id="weiAudioBtn" style="visibility:visible; opacity:1;">
-                                <svg id="weiIconPause" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display:block">
-                                    <rect x="6" y="5" width="4" height="14" rx="1"/>
-                                    <rect x="14" y="5" width="4" height="14" rx="1"/>
-                                </svg>
-                                <svg id="weiIconPlay" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display:none">
-                                    <polygon points="5,3 19,12 5,21"/>
-                                </svg>
-                            </div> -->
-                            <script>
-                                (function() {
-                                    var audio = document.getElementById('weiAudio');
-                                    var audioBtn = document.getElementById('weiAudioBtn');
-                                    var iconPause = document.getElementById('weiIconPause');
-                                    var iconPlay = document.getElementById('weiIconPlay');
-                                    var userUnmuted = false;
-
-                                    audio.addEventListener('error', function() {
-                                        console.warn('weiAudio: the file could not be loaded — check that assets/aduo.mp3 really exists at that path on the server.');
-                                    });
-
-                                    function setIcons(isPlaying) {
-                                        iconPause.style.display = isPlaying ? 'block' : 'none';
-                                        iconPlay.style.display = isPlaying ? 'none' : 'block';
-                                    }
-
-                                    function tryUnmutedPlay() {
-                                        audio.muted = false;
-                                        userUnmuted = true;
-                                        var ap = audio.play();
-                                        if (ap && ap.then) {
-                                            ap.then(function() {
-                                                setIcons(true);
-                                            }).catch(function() {
-                                                setIcons(!audio.paused);
-                                            });
-                                        } else {
-                                            setIcons(!audio.paused);
-                                        }
-                                    }
-
-                                    function startMutedAutoplay() {
-                                        audio.volume = 1;
-                                        audio.muted = true;
-                                        var ap = audio.play();
-                                        if (ap && ap.catch)
-                                            ap.catch(function() {});
-                                        setIcons(!audio.paused);
-                                    }
-
-                                    // Start music automatically as soon as the page loads.
-                                    // Browsers block autoplay WITH sound until the user has
-                                    // interacted with the page, but muted autoplay is always
-                                    // allowed - so we start muted immediately, then unmute on
-                                    // the very first interaction (tap/click/scroll/key) so the
-                                    // song feels like it "plays by itself" without ever needing
-                                    // the button. We retry on a few different lifecycle events
-                                    // in case the browser wasn't ready on the very first try.
-                                    audio.load();
-                                    startMutedAutoplay();
-                                    document.addEventListener('DOMContentLoaded', startMutedAutoplay);
-                                    window.addEventListener('load', startMutedAutoplay);
-                                    window.addEventListener('pageshow', startMutedAutoplay);
-
-                                    ['click', 'touchstart', 'touchend', 'pointerdown', 'scroll', 'keydown'].forEach(function(evt) {
-                                        document.addEventListener(evt, function onFirstInteract() {
-                                            if (!userUnmuted) {
-                                                tryUnmutedPlay();
-                                            } else if (audio.paused) {
-                                                var ap2 = audio.play();
-                                                if (ap2 && ap2.catch)
-                                                    ap2.catch(function() {});
-                                            }
-                                        }, {
-                                            once: true,
-                                            passive: true
-                                        });
-                                    });
-
-                                    // Audio button toggle
-                                    audioBtn.addEventListener('click', function() {
-                                        if (!userUnmuted) {
-                                            tryUnmutedPlay();
-                                            return;
-                                        }
-                                        if (audio.paused) {
-                                            audio.play();
-                                            setIcons(true);
-                                        } else {
-                                            audio.pause();
-                                            setIcons(false);
-                                        }
-                                    });
-                                }
-                                )();
-                            </script>
-                            <!-- nominify end -->
-                        </div>
-                    </div>
-                </div>
-            </div>
             <div id="rec2487446043" class="r t-rec" style=" " data-animationappear="off" data-record-type="396">
                 <!-- T396 -->
                 <style>
@@ -1428,14 +1287,14 @@
                         <div class='t396__elem tn-elem js-delay-anim tn-elem__24874460431763402147625 t-animate' data-elem-id='1763402147625' data-elem-type='text' data-field-top-value="294" data-field-left-value="320" data-field-height-value="168" data-field-width-value="560" data-field-axisy-value="top" data-field-axisx-value="left" data-field-container-value="grid" data-field-topunits-value="px" data-field-leftunits-value="px" data-field-heightunits-value="px" data-field-widthunits-value="px" data-animate-style="fadeinup" data-animate-duration="2" data-animate-delay="0.2" data-animate-distance="30" data-animate-mobile="y" data-field-textfit-value="autoheight" data-field-fontsize-value="80" data-field-left-res-320-value="-120" data-field-left-res-480-value="-40" data-field-left-res-640-value="40" data-field-left-res-960-value="200">
                             <div class='tn-atom' field='tn_text_1763402147625'>
                                 عبدالله<br/>
-                                <span style="display:block;font-size:0.45em;line-height:1;margin:0.25em 0;">&amp; </span>روان
+                                <span style="display:block;font-size:0.45em;line-height:1;margin:0.25em 0;">&amp;</span>روان
                             </div>
                         </div>
                         <div class='t396__elem tn-elem js-delay-anim tn-elem__2487446043176340398328864790 t-animate' data-elem-id='176340398328864790' data-elem-type='text' data-field-top-value="154" data-field-left-value="320" data-field-height-value="37" data-field-width-value="560" data-field-axisy-value="top" data-field-axisx-value="left" data-field-container-value="grid" data-field-topunits-value="px" data-field-leftunits-value="px" data-field-heightunits-value="px" data-field-widthunits-value="px" data-animate-style="fadeinup" data-animate-duration="2" data-animate-delay="0.3" data-animate-distance="30" data-animate-mobile="y" data-field-textfit-value="fixedsize" data-field-fontsize-value="40" data-field-left-res-320-value="-120" data-field-left-res-480-value="-40" data-field-left-res-640-value="40" data-field-left-res-960-value="200">
                             <div class='tn-atom' field='tn_text_176340398328864790'>كتب الكتاب</div>
                         </div>
                         <div class='t396__elem tn-elem js-delay-anim tn-elem__2487446043176340401720454780 t-animate' data-elem-id='176340401720454780' data-elem-type='text' data-field-top-value="196" data-field-left-value="320" data-field-height-value="37" data-field-width-value="560" data-field-axisy-value="top" data-field-axisx-value="left" data-field-container-value="grid" data-field-topunits-value="px" data-field-leftunits-value="px" data-field-heightunits-value="px" data-field-widthunits-value="px" data-animate-style="fadeinup" data-animate-duration="2" data-animate-delay="0.4" data-animate-distance="30" data-animate-mobile="y" data-field-textfit-value="fixedsize" data-field-fontsize-value="25" data-field-left-res-320-value="-120" data-field-left-res-480-value="-40" data-field-left-res-640-value="40" data-field-left-res-960-value="200" style="display:none;">
-                            <div class='tn-atom' field='tn_text_176340401720454780'>30.08.2026</div>
+                            <div class='tn-atom' field='tn_text_176340401720454780'>30.8.2026</div>
                         </div>
                         <div class='t396__elem tn-elem js-delay-anim tn-elem__2487446043176340390975774690 t-animate' data-elem-id='176340390975774690' data-elem-type='text' data-field-top-value="356" data-field-left-value="578" data-field-height-value="44" data-field-width-value="55" data-field-axisy-value="top" data-field-axisx-value="left" data-field-container-value="grid" data-field-topunits-value="px" data-field-leftunits-value="px" data-field-heightunits-value="px" data-field-widthunits-value="px" data-animate-style="fadeinup" data-animate-duration="2" data-animate-delay="0.2" data-animate-distance="30" data-animate-mobile="y" data-field-textfit-value="autoheight" data-field-fontsize-value="40" data-field-left-res-320-value="138" data-field-left-res-480-value="218" data-field-left-res-640-value="298" data-field-left-res-960-value="458" style="display:none;">
                             <div class='tn-atom' field='tn_text_176340390975774690'>&amp;</div>
@@ -4869,6 +4728,138 @@ t-form__inputsbox_vertical-form t-form__inputsbox_inrow
             </div>
         </div>
         <!--/allrecords-->
+        <!-- Floating audio widget: kept as a direct child of <body>, outside
+             #allrecords, so it is never affected by the page's fade-in
+             opacity or any record-level animation/scale transforms. -->
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&display=swap');
+            /* ── Floating audio button ── */
+            #weiAudioBtn {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                width: 60px;
+                height: 60px;
+                background: #5A0F1B;
+                border-radius: 50%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 2147483647;
+                cursor: pointer;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                visibility: visible;
+                opacity: 1;
+                transition: opacity 0.3s ease-in-out;
+            }
+
+            #weiAudioBtn svg {
+                width: 30px;
+                height: 30px;
+                fill: white;
+            }
+        </style>
+        <!-- Audio -->
+        <audio id="weiAudio" loop preload="auto">
+            <source src="assets/aduo.mp3" type="audio/mp3">
+        </audio>
+        <!-- Floating play/pause button -->
+        <div id="weiAudioBtn">
+            <svg id="weiIconPause" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display:block">
+                <rect x="6" y="5" width="4" height="14" rx="1"/>
+                <rect x="14" y="5" width="4" height="14" rx="1"/>
+            </svg>
+            <svg id="weiIconPlay" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display:none">
+                <polygon points="5,3 19,12 5,21"/>
+            </svg>
+        </div>
+        <script>
+            (function() {
+                var audio = document.getElementById('weiAudio');
+                var audioBtn = document.getElementById('weiAudioBtn');
+                var iconPause = document.getElementById('weiIconPause');
+                var iconPlay = document.getElementById('weiIconPlay');
+                var userUnmuted = false;
+
+                audio.addEventListener('error', function() {
+                    console.warn('weiAudio: the file could not be loaded — check that assets/aduo.mp3 really exists at that exact path (folder "assets", file "aduo.mp3") on the server.');
+                });
+
+                function setIcons(isPlaying) {
+                    iconPause.style.display = isPlaying ? 'block' : 'none';
+                    iconPlay.style.display = isPlaying ? 'none' : 'block';
+                }
+
+                function tryUnmutedPlay() {
+                    audio.muted = false;
+                    userUnmuted = true;
+                    var ap = audio.play();
+                    if (ap && ap.then) {
+                        ap.then(function() {
+                            setIcons(true);
+                        }).catch(function() {
+                            setIcons(!audio.paused);
+                        });
+                    } else {
+                        setIcons(!audio.paused);
+                    }
+                }
+
+                function startMutedAutoplay() {
+                    audio.volume = 1;
+                    audio.muted = true;
+                    var ap = audio.play();
+                    if (ap && ap.catch)
+                        ap.catch(function() {});
+                    setIcons(!audio.paused);
+                }
+
+                // Start music automatically as soon as the page loads.
+                // Browsers block autoplay WITH sound until the user has
+                // interacted with the page, but muted autoplay is always
+                // allowed - so we start muted immediately, then unmute on
+                // the very first interaction (tap/click/scroll/key) so the
+                // song feels like it "plays by itself" without ever needing
+                // the button. We retry on a few different lifecycle events
+                // in case the browser wasn't ready on the very first try.
+                audio.load();
+                startMutedAutoplay();
+                document.addEventListener('DOMContentLoaded', startMutedAutoplay);
+                window.addEventListener('load', startMutedAutoplay);
+                window.addEventListener('pageshow', startMutedAutoplay);
+
+                ['click', 'touchstart', 'touchend', 'pointerdown', 'scroll', 'keydown'].forEach(function(evt) {
+                    document.addEventListener(evt, function onFirstInteract() {
+                        if (!userUnmuted) {
+                            tryUnmutedPlay();
+                        } else if (audio.paused) {
+                            var ap2 = audio.play();
+                            if (ap2 && ap2.catch)
+                                ap2.catch(function() {});
+                        }
+                    }, {
+                        once: true,
+                        passive: true
+                    });
+                });
+
+                // Audio button toggle
+                audioBtn.addEventListener('click', function() {
+                    if (!userUnmuted) {
+                        tryUnmutedPlay();
+                        return;
+                    }
+                    if (audio.paused) {
+                        audio.play();
+                        setIcons(true);
+                    } else {
+                        audio.pause();
+                        setIcons(false);
+                    }
+                });
+            }
+            )();
+        </script>
         <!-- Stat -->
         <script type="text/javascript">
             if (!window.mainTracker) {
