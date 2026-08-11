@@ -7,19 +7,19 @@
         <!--metatextblock-->
         <title>عبدالله وروان</title>
         <meta name="description" content="ندعوكم إلى حفل عقد قران عبدالله وروان - الأحد 30 أغسطس 2026 - صالة تشيلو، الفرقان جانب المنتدى"/>
-        <meta property="og:url" content="https://webgencyinvitations.com/thesacredgarden"/>
+        <!-- <meta property="og:url" content="https://webgencyinvitations.com/thesacredgarden"/> -->
         <meta property="og:title" content="عبدالله وروان"/>
         <meta property="og:description" content="ندعوكم إلى حفل عقد قران عبدالله وروان - الأحد 30 أغسطس 2026 - صالة تشيلو، الفرقان جانب المنتدى"/>
         <meta property="og:type" content="website"/>
         <meta property="og:locale" content="ar_AR"/>
-        <meta property="og:image" content="https://static.tildacdn.net/tild3532-3566-4962-b739-616664393337/Screenshot_2026-06-2.png"/>
+        <!-- <meta property="og:image" content="https://static.tildacdn.net/tild3532-3566-4962-b739-616664393337/Screenshot_2026-06-2.png"/> -->
         <meta property="og:image:width" content="1200"/>
         <meta property="og:image:height" content="630"/>
         <meta name="twitter:card" content="summary_large_image"/>
         <meta name="twitter:title" content="عبدالله وروان"/>
         <meta name="twitter:description" content="ندعوكم إلى حفل عقد قران عبدالله وروان - الأحد 30 أغسطس 2026"/>
-        <meta name="twitter:image" content="https://static.tildacdn.net/tild3532-3566-4962-b739-616664393337/Screenshot_2026-06-2.png"/>
-        <link rel="canonical" href="https://webgencyinvitations.com/thesacredgarden">
+        <!-- <meta name="twitter:image" content="https://static.tildacdn.net/tild3532-3566-4962-b739-616664393337/Screenshot_2026-06-2.png"/> -->
+        <!-- <link rel="canonical" href="https://webgencyinvitations.com/thesacredgarden"> -->
         <!--/metatextblock-->
         <meta name="format-detection" content="telephone=no"/>
         <meta http-equiv="x-dns-prefetch-control" content="on">
@@ -28,11 +28,11 @@
         <link rel="preconnect" href="https://static.tildacdn.net" crossorigin>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <!-- Preload the cover names images so "عبدالله وروان" appears immediately without delay -->
+        Preload the cover names images so "عبدالله وروان" appears immediately without delay -->
         <link rel="preload" as="image" href="https://static.tildacdn.net/tild3134-6461-4832-a236-633431616631/623915249_2629494717.png">
         <link rel="preload" as="image" href="https://static.tildacdn.net/tild3336-3462-4961-a332-613731663665/623915249_2629494717.png">
         <link rel="preload" as="audio" href="assets/aduo.mp3">
-        <!--favicons-->
+        <!--favicons
         <link rel="icon" type="image/png" sizes="32x32" href="https://static.tildacdn.net/tild3331-3833-4662-b234-353330306132/favicon-light_1.png" media="(prefers-color-scheme: light)"/>
         <link rel="icon" type="image/png" sizes="32x32" href="https://static.tildacdn.net/tild3239-3439-4130-a237-303663656638/favicon-dark_1.png" media="(prefers-color-scheme: dark)"/>
         <link rel="icon" type="image/svg+xml" sizes="any" href="https://static.tildacdn.net/tild6630-6464-4531-a461-396132346132/favicon_1.svg">
@@ -782,60 +782,6 @@
                     t_onReady(function() {
                         t_onFuncLoad('t396_init', function() {
                             t396_init('2443433693');
-                            // Auto-open the envelope as soon as the page has
-                            // finished loading — no tap needed. We simulate a
-                            // full pointer/click sequence on the wax seal so
-                            // Tilda's own animation system runs exactly as it
-                            // would for a manual click/tap.
-                            setTimeout(function() {
-                                var seal = document.querySelector('#rec2443433693 .popup-enter');
-                                if (!seal) return;
-                                var rect = seal.getBoundingClientRect();
-                                var cx = rect.left + rect.width / 2;
-                                var cy = rect.top + rect.height / 2;
-                                var opts = {
-                                    bubbles: true,
-                                    cancelable: true,
-                                    view: window,
-                                    clientX: cx,
-                                    clientY: cy
-                                };
-                                ['pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click'].forEach(function(type) {
-                                    try {
-                                        var Ctor = (type.indexOf('pointer') === 0) ? PointerEvent : MouseEvent;
-                                        seal.dispatchEvent(new Ctor(type, opts));
-                                    } catch (e) {}
-                                });
-                                try {
-                                    seal.click();
-                                } catch (e) {}
-                                // Safety net: if the seal/ring graphic (or the
-                                // "click to open" label) is still visible a
-                                // moment later - meaning Tilda's own click
-                                // handling didn't catch our simulated click -
-                                // fade them out and release the page-lock
-                                // ourselves so nothing is left stuck on screen.
-                                setTimeout(function() {
-                                    var stillThere = window.getComputedStyle(seal).opacity !== '0';
-                                    if (stillThere) {
-                                        seal.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-                                        seal.style.transform = 'scale(1.22)';
-                                        seal.style.opacity = '0';
-                                        seal.style.pointerEvents = 'none';
-                                        var label = document.querySelector('#rec2443433693 .tn-elem[data-elem-id="1777183175514000001"]');
-                                        if (label) {
-                                            label.style.transition = 'opacity 0.6s ease';
-                                            label.style.opacity = '0';
-                                        }
-                                        var artboard = document.querySelector('#rec2443433693 .t396__artboard');
-                                        if (artboard && window.getComputedStyle(artboard).position === 'fixed') {
-                                            artboard.style.position = 'absolute';
-                                        }
-                                        document.body.style.overflow = '';
-                                        document.documentElement.style.overflow = '';
-                                    }
-                                }, 1600);
-                            }, 700);
                         });
                     });
                 </script>
