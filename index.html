@@ -5475,7 +5475,7 @@ t-form__inputsbox_vertical-form t-form__inputsbox_inrow
                 var audioBtn = document.getElementById('weiAudioBtn');
                 var iconPause = document.getElementById('weiIconPause');
                 var iconPlay = document.getElementById('weiIconPlay');
-                var userUnmuted = false;
+                var started = false;
 
                 audio.addEventListener('error', function() {
                     console.warn('weiAudio: the file could not be loaded — check that assets/aduo.mp3 really exists at that exact path (folder "assets", file "aduo.mp3") on the server.');
@@ -5486,14 +5486,26 @@ t-form__inputsbox_vertical-form t-form__inputsbox_inrow
                     iconPlay.style.display = isPlaying ? 'none' : 'block';
                 }
 
-                function tryUnmutedPlay() {
+                // Fully buffer the track ahead of time (in addition to the
+                // <link rel="preload" as="audio"> in <head>) so that by the
+                // moment the card is tapped there is zero loading delay.
+                audio.load();
+
+                function startAudio() {
+                    if (started) return;
+                    started = true;
+                    audio.volume = 1;
                     audio.muted = false;
-                    userUnmuted = true;
                     var ap = audio.play();
                     if (ap && ap.then) {
                         ap.then(function() {
                             setIcons(true);
                         }).catch(function() {
+                            // Playback was blocked for some reason (e.g. the
+                            // click wasn't recognized by the browser as a
+                            // real gesture) — allow a retry on the next tap
+                            // of the floating button or the card.
+                            started = false;
                             setIcons(!audio.paused);
                         });
                     } else {
@@ -5501,61 +5513,29 @@ t-form__inputsbox_vertical-form t-form__inputsbox_inrow
                     }
                 }
 
-                function startMutedAutoplay() {
-                    audio.volume = 1;
-                    audio.muted = true;
-                    var ap = audio.play();
-                    if (ap && ap.catch)
-                        ap.catch(function() {});
-                    setIcons(!audio.paused);
+                // Play the music the instant the invitation card (wax seal)
+                // is tapped/clicked — this is a genuine user gesture, so the
+                // browser allows unmuted playback immediately, no muted
+                // autoplay trick or "first interaction anywhere" needed.
+                var seal = document.querySelector('#rec2443433693 .popup-enter');
+                if (seal) {
+                    seal.addEventListener('click', startAudio);
+                    seal.addEventListener('touchend', startAudio);
                 }
 
-                // Start music automatically as soon as the page loads.
-                // Browsers block autoplay WITH sound until the user has
-                // interacted with the page, but muted autoplay is always
-                // allowed - so we start muted immediately, then unmute on
-                // the very first interaction (tap/click/scroll/key) so the
-                // song feels like it "plays by itself" without ever needing
-                // the button. We retry on a few different lifecycle events
-                // in case the browser wasn't ready on the very first try.
-                audio.load();
-                startMutedAutoplay();
-                document.addEventListener('DOMContentLoaded', startMutedAutoplay);
-                window.addEventListener('load', startMutedAutoplay);
-                window.addEventListener('pageshow', startMutedAutoplay);
-
-                var audioUnlockHandled = false;
-                var audioUnlockEvents = ['click', 'touchstart', 'touchend', 'pointerdown', 'scroll', 'keydown'];
-                function onFirstInteract(e) {
-                    // Ignore synthetic/programmatic events (e.g. the
-                    // auto-opened envelope's simulated click) so only a
-                    // real, trusted user gesture unlocks unmuted audio -
-                    // and so that gesture isn't "used up" by our own code.
-                    if (!e.isTrusted || audioUnlockHandled) return;
-                    audioUnlockHandled = true;
-                    audioUnlockEvents.forEach(function(evt2) {
-                        document.removeEventListener(evt2, onFirstInteract, {
-                            passive: true
-                        });
-                    });
-                    if (!userUnmuted) {
-                        tryUnmutedPlay();
-                    } else if (audio.paused) {
-                        var ap2 = audio.play();
-                        if (ap2 && ap2.catch)
-                            ap2.catch(function() {});
-                    }
+                // Fallback: if the card markup ever changes and the seal
+                // isn't found, fall back to starting on the first genuine
+                // tap/click anywhere on the page.
+                if (!seal) {
+                    document.addEventListener('click', startAudio, { once: true });
+                    document.addEventListener('touchend', startAudio, { once: true });
                 }
-                audioUnlockEvents.forEach(function(evt) {
-                    document.addEventListener(evt, onFirstInteract, {
-                        passive: true
-                    });
-                });
 
-                // Audio button toggle
+                // Floating play/pause button — also doubles as a manual way
+                // to start the music if it didn't start automatically.
                 audioBtn.addEventListener('click', function() {
-                    if (!userUnmuted) {
-                        tryUnmutedPlay();
+                    if (!started) {
+                        startAudio();
                         return;
                     }
                     if (audio.paused) {
