@@ -15,7 +15,7 @@
         <!-- <meta property="og:image" content="https://static.tildacdn.net/tild3532-3566-4962-b739-616664393337/Screenshot_2026-06-2.png"/> -->
         <meta property="og:image:width" content="1200"/>
         <meta property="og:image:height" content="630"/>
-        <meta name="twitter:card" content="summary_large_image"/>
+        <!-- <meta name="twitter:card" content="summary_large_image"/> -->
         <meta name="twitter:title" content="عبدالله وروان"/>
         <meta name="twitter:description" content="ندعوكم إلى حفل عقد قران عبدالله وروان - الأحد 30 أغسطس 2026"/>
         <!-- <meta name="twitter:image" content="https://static.tildacdn.net/tild3532-3566-4962-b739-616664393337/Screenshot_2026-06-2.png"/> -->
@@ -28,15 +28,16 @@
         <link rel="preconnect" href="https://static.tildacdn.net" crossorigin>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <!-- Preload the cover names images so "عبدالله وروان" appears immediately without delay -->
         <link rel="preload" as="image" href="https://static.tildacdn.net/tild3134-6461-4832-a236-633431616631/623915249_2629494717.png">
         <link rel="preload" as="image" href="https://static.tildacdn.net/tild3336-3462-4961-a332-613731663665/623915249_2629494717.png">
         <link rel="preload" as="audio" href="assets/aduo.mp3">
-        <!--favicons
-        <link rel="icon" type="image/png" sizes="32x32" href="https://static.tildacdn.net/tild3331-3833-4662-b234-353330306132/favicon-light_1.png" media="(prefers-color-scheme: light)"/>
-        <link rel="icon" type="image/png" sizes="32x32" href="https://static.tildacdn.net/tild3239-3439-4130-a237-303663656638/favicon-dark_1.png" media="(prefers-color-scheme: dark)"/>
-        <link rel="icon" type="image/svg+xml" sizes="any" href="https://static.tildacdn.net/tild6630-6464-4531-a461-396132346132/favicon_1.svg">
-        <link rel="apple-touch-icon" type="image/png" href="https://static.tildacdn.net/tild3761-3535-4439-b530-303639633934/apple-touch-icon_1.png">
-        <link rel="icon" type="image/png" sizes="192x192" href="https://static.tildacdn.net/tild3761-3535-4439-b530-303639633934/apple-touch-icon_1.png">
+        <!--favicons-->
+        <!-- <link rel="icon" type="image/png" sizes="32x32" href="https://static.tildacdn.net/tild3331-3833-4662-b234-353330306132/favicon-light_1.png" media="(prefers-color-scheme: light)"/> -->
+        <!-- <link rel="icon" type="image/png" sizes="32x32" href="https://static.tildacdn.net/tild3239-3439-4130-a237-303663656638/favicon-dark_1.png" media="(prefers-color-scheme: dark)"/> -->
+        <!-- <link rel="icon" type="image/svg+xml" sizes="any" href="https://static.tildacdn.net/tild6630-6464-4531-a461-396132346132/favicon_1.svg"> -->
+        <!-- <link rel="apple-touch-icon" type="image/png" href="https://static.tildacdn.net/tild3761-3535-4439-b530-303639633934/apple-touch-icon_1.png"> -->
+        <!-- <link rel="icon" type="image/png" sizes="192x192" href="https://static.tildacdn.net/tild3761-3535-4439-b530-303639633934/apple-touch-icon_1.png"> -->
         <!--/favicons-->
         <!-- Assets -->
         <script src="https://neo.tildacdn.com/js/tilda-fallback-1.0.min.js" async charset="utf-8"></script>
@@ -5609,12 +5610,33 @@ t-form__inputsbox_vertical-form t-form__inputsbox_inrow
                 // the very first interaction (tap/click/scroll/key) so the
                 // song feels like it "plays by itself" without ever needing
                 // the button. We retry on a few different lifecycle events
-                // in case the browser wasn't ready on the very first try.
+                // in case the browser wasn't ready on the very first try -
+                // but ONLY while the user hasn't unmuted yet. Without this
+                // guard, a late 'load'/'pageshow' event firing AFTER the
+                // visitor already tapped and unmuted would silently re-mute
+                // the still-playing track, which is exactly what made the
+                // music sound like it "cuts off by itself" partway through.
+                function safeStartMutedAutoplay() {
+                    if (!userUnmuted) {
+                        startMutedAutoplay();
+                    }
+                }
                 audio.load();
                 startMutedAutoplay();
-                document.addEventListener('DOMContentLoaded', startMutedAutoplay);
-                window.addEventListener('load', startMutedAutoplay);
-                window.addEventListener('pageshow', startMutedAutoplay);
+                document.addEventListener('DOMContentLoaded', safeStartMutedAutoplay);
+                window.addEventListener('load', safeStartMutedAutoplay);
+                window.addEventListener('pageshow', safeStartMutedAutoplay);
+
+                // Extra safety net: if looping ever fails to kick in for any
+                // reason (some older mobile browsers can be flaky with the
+                // native "loop" attribute right at the track boundary),
+                // restart playback immediately instead of leaving it silent.
+                audio.addEventListener('ended', function() {
+                    audio.currentTime = 0;
+                    var ap = audio.play();
+                    if (ap && ap.catch)
+                        ap.catch(function() {});
+                });
 
                 var audioUnlockHandled = false;
                 var audioUnlockEvents = ['click', 'touchstart', 'touchend', 'pointerdown', 'scroll', 'keydown'];
