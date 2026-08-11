@@ -774,60 +774,11 @@
                     t_onReady(function() {
                         t_onFuncLoad('t396_init', function() {
                             t396_init('2443433693');
-                            // Auto-open the envelope as soon as the page has
-                            // finished loading — no tap needed. We simulate a
-                            // full pointer/click sequence on the wax seal so
-                            // Tilda's own animation system runs exactly as it
-                            // would for a manual click/tap.
-                            setTimeout(function() {
-                                var seal = document.querySelector('#rec2443433693 .popup-enter');
-                                if (!seal) return;
-                                var rect = seal.getBoundingClientRect();
-                                var cx = rect.left + rect.width / 2;
-                                var cy = rect.top + rect.height / 2;
-                                var opts = {
-                                    bubbles: true,
-                                    cancelable: true,
-                                    view: window,
-                                    clientX: cx,
-                                    clientY: cy
-                                };
-                                ['pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click'].forEach(function(type) {
-                                    try {
-                                        var Ctor = (type.indexOf('pointer') === 0) ? PointerEvent : MouseEvent;
-                                        seal.dispatchEvent(new Ctor(type, opts));
-                                    } catch (e) {}
-                                });
-                                try {
-                                    seal.click();
-                                } catch (e) {}
-                                // Safety net: if the seal/ring graphic (or the
-                                // "click to open" label) is still visible a
-                                // moment later - meaning Tilda's own click
-                                // handling didn't catch our simulated click -
-                                // fade them out and release the page-lock
-                                // ourselves so nothing is left stuck on screen.
-                                setTimeout(function() {
-                                    var stillThere = window.getComputedStyle(seal).opacity !== '0';
-                                    if (stillThere) {
-                                        seal.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-                                        seal.style.transform = 'scale(1.22)';
-                                        seal.style.opacity = '0';
-                                        seal.style.pointerEvents = 'none';
-                                        var label = document.querySelector('#rec2443433693 .tn-elem[data-elem-id="1777183175514000001"]');
-                                        if (label) {
-                                            label.style.transition = 'opacity 0.6s ease';
-                                            label.style.opacity = '0';
-                                        }
-                                        var artboard = document.querySelector('#rec2443433693 .t396__artboard');
-                                        if (artboard && window.getComputedStyle(artboard).position === 'fixed') {
-                                            artboard.style.position = 'absolute';
-                                        }
-                                        document.body.style.overflow = '';
-                                        document.documentElement.style.overflow = '';
-                                    }
-                                }, 1600);
-                            }, 700);
+                            // The envelope now only opens when the user actually
+                            // taps/clicks the wax seal — Tilda's own click
+                            // animation (data-animate-sbs-event="click" on the
+                            // seal element) handles the opening, so no
+                            // auto-trigger or simulated click is needed here.
                         });
                     });
                 </script>
