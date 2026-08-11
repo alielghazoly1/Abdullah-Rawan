@@ -5710,5 +5710,47 @@ t-form__inputsbox_vertical-form t-form__inputsbox_inrow
                 )(document, window, 'aed5bb11e83b8f0989507efd8c6904b3', 'script', 'https://static.tildacdn.net/js/tilda-stat-1.0.min.js');
             }, 2000);
         </script>
+        <script>
+            (function() {
+                // سكرول بطيء لتحت بعد الضغط على "اضغط للفتح"
+                function slowScrollTo(targetY, duration) {
+                    var startY = window.pageYOffset;
+                    var diff = targetY - startY;
+                    var startTime = null;
+                    function easeInOutQuad(t) {
+                        return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+                    }
+                    function step(timestamp) {
+                        if (!startTime) startTime = timestamp;
+                        var elapsed = timestamp - startTime;
+                        var progress = Math.min(elapsed / duration, 1);
+                        window.scrollTo(0, startY + diff * easeInOutQuad(progress));
+                        if (progress < 1) {
+                            window.requestAnimationFrame(step);
+                        }
+                    }
+                    window.requestAnimationFrame(step);
+                }
+
+                function bindOpenScroll() {
+                    var openBtn = document.querySelector('[data-elem-id="1773847037346"]');
+                    if (!openBtn) return;
+                    openBtn.addEventListener('click', function() {
+                        // ننتظر لحد ما أنيميشن فتح الدعوة تخلص (حوالي 2.2 ثانية) قبل ما نعمل سكرول
+                        setTimeout(function() {
+                            var nextSection = document.getElementById('rec2487446043');
+                            var targetY = nextSection ? nextSection.getBoundingClientRect().top + window.pageYOffset : window.innerHeight;
+                            slowScrollTo(targetY, 3000); // سكرول بطيء يستغرق 3 ثواني
+                        }, 2200);
+                    });
+                }
+
+                if (document.readyState != 'loading') {
+                    bindOpenScroll();
+                } else {
+                    document.addEventListener('DOMContentLoaded', bindOpenScroll);
+                }
+            })();
+        </script>
     </body>
 </html>
