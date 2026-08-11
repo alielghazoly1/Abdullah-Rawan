@@ -5713,8 +5713,10 @@ t-form__inputsbox_vertical-form t-form__inputsbox_inrow
         <script>
             (function() {
                 // سكرول بطيء لتحت بعد الضغط على "اضغط للفتح"
+                var alreadyTriggered = false;
+
                 function slowScrollTo(targetY, duration) {
-                    var startY = window.pageYOffset;
+                    var startY = window.pageYOffset || document.documentElement.scrollTop;
                     var diff = targetY - startY;
                     var startTime = null;
                     function easeInOutQuad(t) {
@@ -5732,24 +5734,36 @@ t-form__inputsbox_vertical-form t-form__inputsbox_inrow
                     window.requestAnimationFrame(step);
                 }
 
-                function bindOpenScroll() {
-                    var openBtn = document.querySelector('[data-elem-id="1773847037346"]');
-                    if (!openBtn) return;
-                    openBtn.addEventListener('click', function() {
-                        // ننتظر لحد ما أنيميشن فتح الدعوة تخلص (حوالي 2.2 ثانية) قبل ما نعمل سكرول
-                        setTimeout(function() {
-                            var nextSection = document.getElementById('rec2487446043');
-                            var targetY = nextSection ? nextSection.getBoundingClientRect().top + window.pageYOffset : window.innerHeight;
-                            slowScrollTo(targetY, 3000); // سكرول بطيء يستغرق 3 ثواني
-                        }, 2200);
-                    });
+                function doAutoScroll() {
+                    if (alreadyTriggered) return;
+                    alreadyTriggered = true;
+                    // ننتظر لحد ما أنيميشن فتح الدعوة تخلص قبل ما نعمل سكرول
+                    setTimeout(function() {
+                        var nextSection = document.getElementById('rec2487446043');
+                        var targetY = nextSection
+                            ? nextSection.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop)
+                            : window.innerHeight;
+                        slowScrollTo(targetY, 3500); // سكرول بطيء يستغرق حوالي 3.5 ثانية
+                    }, 2200);
                 }
 
-                if (document.readyState != 'loading') {
-                    bindOpenScroll();
-                } else {
-                    document.addEventListener('DOMContentLoaded', bindOpenScroll);
+                function isOpenTrigger(el) {
+                    if (!el || !el.closest) return false;
+                    return !!el.closest('[data-elem-id="1773847037346"]');
                 }
+
+                // مستمع في مرحلة الـ capture عشان نمسك الضغطة قبل أي مكتبة تانية توقفها
+                document.addEventListener('click', function(e) {
+                    if (isOpenTrigger(e.target)) {
+                        doAutoScroll();
+                    }
+                }, true);
+
+                document.addEventListener('touchend', function(e) {
+                    if (isOpenTrigger(e.target)) {
+                        doAutoScroll();
+                    }
+                }, true);
             })();
         </script>
     </body>
